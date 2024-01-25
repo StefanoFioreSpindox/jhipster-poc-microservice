@@ -1,0 +1,37 @@
+{
+  "workspaces": {
+    "packages": [
+      "gateway",
+      "products"
+    ]
+  },
+  "scripts": {
+    "backend:build-cache": "concurrently npm:backend:build-cache:gateway npm:backend:build-cache:products",
+    "backend:build-cache:gateway": "npm run backend:build-cache --workspace gateway --if-present",
+    "backend:build-cache:products": "npm run backend:build-cache --workspace products --if-present",
+    "ci:backend:test": "npm run ci:backend:test --workspaces --if-present",
+    "ci:e2e:package": "npm run ci:docker:build --workspaces --if-present && npm run java:docker --workspaces --if-present",
+    "ci:e2e:prepare": "npm run docker-compose",
+    "ci:e2e:run": "npm run e2e:headless --workspaces --if-present",
+    "ci:e2e:teardown": "docker compose -f docker-compose/docker-compose.yml down -v",
+    "ci:frontend:test": "npm run ci:frontend:test --workspaces --if-present",
+    "docker-compose": "docker compose -f docker-compose/docker-compose.yml up --wait",
+    "java:docker": "concurrently npm:java:docker:gateway npm:java:docker:products",
+    "java:docker:arm64": "concurrently npm:java:docker:arm64:gateway npm:java:docker:arm64:products",
+    "java:docker:arm64:gateway": "npm run java:docker:arm64 --workspace gateway --if-present",
+    "java:docker:arm64:products": "npm run java:docker:arm64 --workspace products --if-present",
+    "java:docker:gateway": "npm run java:docker --workspace gateway --if-present",
+    "java:docker:products": "npm run java:docker --workspace products --if-present",
+    "watch": "concurrently npm:watch:gateway npm:watch:products",
+    "watch:gateway": "npm run watch --workspace gateway --if-present",
+    "watch:products": "npm run watch --workspace products --if-present",
+    "webapp:test": "npm run webapp:test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "8.2.2",
+    "rxjs": "7.8.1"
+  },
+  "overrides": {
+    "webpack": "5.89.0"
+  }
+}

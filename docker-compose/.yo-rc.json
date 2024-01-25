@@ -1,0 +1,11 @@
+{
+  "generator-jhipster": {
+    "adminPassword": "admin",
+    "appsFolders": ["gateway", "products"],
+    "directoryPath": "..\\/",
+    "jhipsterVersion": "8.1.0",
+    "jwtSecretKey": "MGQ1MjI2ZTc1YmNmNWM4NTg4YjU4MTYyY2ZmOTM4YmQwMGNkMWRjYzFjZWM1YTg5ZDJlOTI1M2EwODYwZTk4ODk5N2RkN2NlMTQyYjJkM2E0ZTAyMGQyZmI4MGE4Y2NhMDBkOQ==",
+    "monitoring": "no",
+    "serviceDiscoveryType": "eureka"
+  }
+}

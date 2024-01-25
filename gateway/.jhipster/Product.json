@@ -1,0 +1,30 @@
+{
+  "annotations": {
+    "changelogDate": "20240119132644"
+  },
+  "applications": ["gateway", "products"],
+  "clientRootFolder": "products",
+  "databaseType": "sql",
+  "dto": "mapstruct",
+  "entityTableName": "product",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["unique"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "quantity",
+      "fieldType": "Integer"
+    }
+  ],
+  "microserviceName": "products",
+  "name": "Product",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

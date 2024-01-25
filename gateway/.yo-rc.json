@@ -1,0 +1,45 @@
+{
+  "generator-jhipster": {
+    "applicationIndex": 0,
+    "applicationType": "gateway",
+    "applications": {
+      "products": {
+        "applicationIndex": 1,
+        "clientFramework": "no",
+        "serverPort": "8081"
+      }
+    },
+    "authenticationType": "jwt",
+    "baseName": "gateway",
+    "buildTool": "maven",
+    "cacheProvider": "hazelcast",
+    "clientFramework": "angular",
+    "clientTheme": "none",
+    "creationTimestamp": 1705666084773,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "devServerPort": 4200,
+    "enableHibernateCache": true,
+    "enableSwaggerCodegen": false,
+    "enableTranslation": true,
+    "entities": ["Product", "Category"],
+    "feignClient": false,
+    "jhipsterVersion": "8.1.0",
+    "jwtSecretKey": "NWViMDEyNjhkYmRlZDBiOTE1OTUzZjZhMWZlMDBhZjE4MjJkZjcwYjE5ZTgwNTI0Y2Q5MTBlOGY4NmYzMGYyMDU0YTY5NTI4NTU5MzgyYmIwYTY2NGY4NDkwMzFiY2EwODU1ZWYxOTZjMjQ2OTkwNTlkMmQ4MzY5NzUyYTVhNGM=",
+    "languages": ["en", "it"],
+    "messageBroker": false,
+    "microfrontend": false,
+    "microfrontends": [],
+    "nativeLanguage": "en",
+    "packageFolder": "it/spindox/jhipsterpoc/gateway",
+    "packageName": "it.spindox.jhipsterpoc.gateway",
+    "prodDatabaseType": "postgresql",
+    "reactive": true,
+    "searchEngine": false,
+    "serverPort": "8080",
+    "serviceDiscoveryType": "eureka",
+    "testFrameworks": [],
+    "websocket": false,
+    "withAdminUi": true
+  }
+}
