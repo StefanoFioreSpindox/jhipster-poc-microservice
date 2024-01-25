@@ -21,6 +21,7 @@
     "languages": ["en", "it"],
     "messageBroker": false,
     "microfrontends": [],
+    "monorepository": true,
     "nativeLanguage": "en",
     "packageFolder": "it/spindox/jhipsterpoc/products",
     "packageName": "it.spindox.jhipsterpoc.products",
@@ -30,6 +31,7 @@
     "serverPort": "8081",
     "serviceDiscoveryType": "eureka",
     "skipClient": true,
+    "skipCommitHook": true,
     "skipUserManagement": true,
     "testFrameworks": [],
     "websocket": false

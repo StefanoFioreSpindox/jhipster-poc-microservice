@@ -30,6 +30,7 @@
     "messageBroker": false,
     "microfrontend": false,
     "microfrontends": [],
+    "monorepository": true,
     "nativeLanguage": "en",
     "packageFolder": "it/spindox/jhipsterpoc/gateway",
     "packageName": "it.spindox.jhipsterpoc.gateway",
@@ -38,6 +39,7 @@
     "searchEngine": false,
     "serverPort": "8080",
     "serviceDiscoveryType": "eureka",
+    "skipCommitHook": true,
     "testFrameworks": [],
     "websocket": false,
     "withAdminUi": true
