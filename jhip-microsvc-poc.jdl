@@ -93,3 +93,9 @@ service Category, Product with serviceImpl
 search Category, Product with no
 microservice Category, Product with products
 clientRootFolder Category, Product with products
+
+deployment {
+  deploymentType docker-compose
+  appsFolders [gateway, products]
+  dockerRepositoryName "stefanofiorespindox"
+}
