@@ -20,3 +20,28 @@ and finally
 ```
 jhipster docker-compose
 ```
+
+### Run the application
+#### Prerequisites
+- Docker daemon needs to be up & running
+- Build microservices images:
+Run the following command in each root directory of your microservice application (e.g. in products and gateway folders)
+```
+./mvnw -ntp -Pprod verify jib:dockerBuild
+```
+
+To run the microservice application locally, go to the docker-compose folder
+```
+cd docker-compose
+```
+run docker-compose up
+```
+docker-compose up -d
+```
+
+The gateway will be reachable on http://localhost:8080/
+
+To tear down the application (in docker-compose folder)
+```
+docker-compose down
+```
