@@ -6,3 +6,17 @@ All the applications folders (products & gateway) have been generated using the 
 jhipster jdl jhip-microsvc-poc.jdl
 ```
 JHipster CLI uses the jdl file to read all the configurations ans all the applications details.
+
+### Docker-Compose
+Docker Compose folder has been created manually with 
+```
+mkdir docker-compose
+```
+then populated with JHipster CLI:
+```
+cd docker-compose
+```
+and finally
+```
+jhipster docker-compose
+```
