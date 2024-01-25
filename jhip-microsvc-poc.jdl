@@ -96,6 +96,7 @@ clientRootFolder Category, Product with products
 
 deployment {
   deploymentType docker-compose
+  serviceDiscoveryType eureka
   appsFolders [gateway, products]
   dockerRepositoryName "stefanofiorespindox"
 }

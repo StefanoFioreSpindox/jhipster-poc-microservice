@@ -1,11 +1,18 @@
 {
   "generator-jhipster": {
     "adminPassword": "admin",
-    "appsFolders": ["gateway", "products"],
+    "appsFolders": [
+      "gateway",
+      "products"
+    ],
     "directoryPath": "../",
     "jhipsterVersion": "8.1.0",
     "jwtSecretKey": "MzllMGI5MGI1ZDdmODgwNWM4M2M5MDFiZjgxNjNlNzY3MzdkY2FjZTkzODQxNjk2NzQ5MzBmOTIxODQwMWFjZTI2YTRhMjcwM2ZkMjJhMDJiZGQzMjAwMjNkNWQyNzliOWE1OQ==",
     "monitoring": "no",
-    "serviceDiscoveryType": "eureka"
+    "serviceDiscoveryType": "eureka",
+    "gatewayType": "SpringCloudGateway",
+    "clusteredDbApps": [],
+    "deploymentType": "docker-compose",
+    "dockerRepositoryName": "stefanofiorespindox"
   }
 }
