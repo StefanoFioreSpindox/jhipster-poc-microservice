@@ -20,6 +20,16 @@ and finally
 ```
 jhipster docker-compose
 ```
+#### (Update)
+You neither need to create the docker-compose folder nor it's content with "jhipster docker-compose" if you add these lines to your jdl file:
+```
+// will be created under the 'docker-compose' folder
+deployment {
+  deploymentType docker-compose
+  appsFolders [gateway, products]
+  dockerRepositoryName "yourDockerLoginName"
+}
+```
 
 ### Run the application
 #### Prerequisites
