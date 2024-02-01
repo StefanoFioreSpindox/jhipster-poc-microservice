@@ -1,6 +1,9 @@
 {
   "generator-jhipster": {
-    "appsFolders": ["gateway", "products"],
+    "appsFolders": [
+      "gateway",
+      "products"
+    ],
     "clusteredDbApps": [],
     "dbRandomPassword": "a824255ba346a2020fcfa199f663207f038e1bdce0e79a178670ec327082",
     "deploymentType": "kubernetes",
