@@ -100,3 +100,15 @@ deployment {
   appsFolders [gateway, products]
   dockerRepositoryName "stefanofiorespindox"
 }
+
+deployment {
+  deploymentType kubernetes
+  serviceDiscoveryType eureka
+  appsFolders [gateway, products]
+  dockerRepositoryName "stefanofiorespindox"
+  kubernetesServiceType Ingress
+  ingressType nginx
+  ingressDomain "spindox.dev"
+  monitoring no
+  kubernetesNamespace jhipster-poc
+}

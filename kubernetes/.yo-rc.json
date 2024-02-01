@@ -1,0 +1,22 @@
+{
+  "generator-jhipster": {
+    "appsFolders": ["gateway", "products"],
+    "clusteredDbApps": [],
+    "dbRandomPassword": "a824255ba346a2020fcfa199f663207f038e1bdce0e79a178670ec327082",
+    "deploymentType": "kubernetes",
+    "directoryPath": "../",
+    "dockerPushCommand": "docker push",
+    "dockerRepositoryName": "stefanofiorespindox",
+    "ingressDomain": "spindox.dev",
+    "ingressType": "nginx",
+    "istio": false,
+    "jhipsterVersion": "8.1.0",
+    "jwtSecretKey": "NzIxN2Q5N2UwNTM4MDc4ODkzNzJlYzYzMWM2MmMzZTFkZWNhYmY4ZGM0YzViYTA4YzU0YzI4OGM4MTBjMWE3ZTkyMzY0YzgwZTllMTg5N2YyZTk4NzMwODY3YTEyODY0OGI3ZQ==",
+    "kubernetesNamespace": "jhipster-poc",
+    "kubernetesServiceType": "Ingress",
+    "kubernetesStorageClassName": "",
+    "kubernetesUseDynamicStorage": false,
+    "monitoring": "no",
+    "serviceDiscoveryType": "eureka"
+  }
+}

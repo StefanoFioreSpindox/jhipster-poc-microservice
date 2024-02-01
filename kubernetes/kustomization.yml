@@ -1,0 +1,20 @@
+commonLabels:
+  app.kubernetes.io/genereted-by: JHipster
+
+namespace: jhipster-poc
+
+resources:
+  - namespace.yml
+  # Individual apps
+  - gateway-k8s/gateway-deployment.yml
+  - gateway-k8s/gateway-service.yml
+  - gateway-k8s/gateway-postgresql.yml
+  - gateway-k8s/gateway-ingress.yml
+  - products-k8s/products-deployment.yml
+  - products-k8s/products-service.yml
+  - products-k8s/products-postgresql.yml
+  # service discovery eureka/consul
+  - registry-k8s/jhipster-registry.yml
+  - registry-k8s/application-configmap.yml
+
+patchesJson6902:
