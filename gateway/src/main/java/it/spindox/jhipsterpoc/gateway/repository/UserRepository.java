@@ -5,17 +5,20 @@ import static org.springframework.data.relational.core.query.Query.query;
 
 import it.spindox.jhipsterpoc.gateway.domain.Authority;
 import it.spindox.jhipsterpoc.gateway.domain.User;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.beanutils.BeanComparator;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.convert.R2dbcConverter;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.relational.core.sql.Column;
+import org.springframework.data.relational.core.sql.Expression;
+import org.springframework.data.relational.core.sql.Table;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -27,15 +30,7 @@ import reactor.util.function.Tuples;
  * Spring Data R2DBC repository for the {@link User} entity.
  */
 @Repository
-public interface UserRepository extends R2dbcRepository<User, Long>, UserRepositoryInternal {
-    Mono<User> findOneByActivationKey(String activationKey);
-
-    Flux<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(LocalDateTime dateTime);
-
-    Mono<User> findOneByResetKey(String resetKey);
-
-    Mono<User> findOneByEmailIgnoreCase(String email);
-
+public interface UserRepository extends R2dbcRepository<User, String>, UserRepositoryInternal {
     Mono<User> findOneByLogin(String login);
 
     Flux<User> findAllByIdNotNull(Pageable pageable);
@@ -45,7 +40,7 @@ public interface UserRepository extends R2dbcRepository<User, Long>, UserReposit
     Mono<Long> count();
 
     @Query("INSERT INTO jhi_user_authority VALUES(:userId, :authority)")
-    Mono<Void> saveUserAuthority(Long userId, String authority);
+    Mono<Void> saveUserAuthority(String userId, String authority);
 
     @Query("DELETE FROM jhi_user_authority")
     Mono<Void> deleteAllUserAuthorities();
@@ -54,14 +49,10 @@ public interface UserRepository extends R2dbcRepository<User, Long>, UserReposit
     Mono<Void> deleteUserAuthorities(Long userId);
 }
 
-interface DeleteExtended<T> {
-    Mono<Void> delete(T user);
-}
-
-interface UserRepositoryInternal extends DeleteExtended<User> {
+interface UserRepositoryInternal {
     Mono<User> findOneWithAuthoritiesByLogin(String login);
 
-    Mono<User> findOneWithAuthoritiesByEmailIgnoreCase(String email);
+    Mono<User> create(User user);
 
     Flux<User> findAllWithAuthorities(Pageable pageable);
 }
@@ -81,11 +72,6 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
     @Override
     public Mono<User> findOneWithAuthoritiesByLogin(String login) {
         return findOneWithAuthoritiesBy("login", login);
-    }
-
-    @Override
-    public Mono<User> findOneWithAuthoritiesByEmailIgnoreCase(String email) {
-        return findOneWithAuthoritiesBy("email", email.toLowerCase());
     }
 
     @Override
@@ -115,12 +101,8 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
     }
 
     @Override
-    public Mono<Void> delete(User user) {
-        return db
-            .sql("DELETE FROM jhi_user_authority WHERE user_id = :userId")
-            .bind("userId", user.getId())
-            .then()
-            .then(r2dbcEntityTemplate.delete(User.class).matching(query(where("id").is(user.getId()))).all().then());
+    public Mono<User> create(User user) {
+        return r2dbcEntityTemplate.insert(User.class).using(user).defaultIfEmpty(user);
     }
 
     private Mono<User> findOneWithAuthoritiesBy(String fieldName, Object fieldValue) {
@@ -143,12 +125,28 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
                 .filter(t -> t.getT2().isPresent())
                 .map(t -> {
                     Authority authority = new Authority();
-                    authority.setName(t.getT2().orElseThrow());
+                    authority.setName(t.getT2().get());
                     return authority;
                 })
                 .collect(Collectors.toSet())
         );
 
         return user;
+    }
+}
+
+class UserSqlHelper {
+
+    static List<Expression> getColumns(Table table, String columnPrefix) {
+        List<Expression> columns = new ArrayList<>();
+        columns.add(Column.aliased("id", table, columnPrefix + "_id"));
+        columns.add(Column.aliased("login", table, columnPrefix + "_login"));
+        columns.add(Column.aliased("first_name", table, columnPrefix + "_first_name"));
+        columns.add(Column.aliased("last_name", table, columnPrefix + "_last_name"));
+        columns.add(Column.aliased("email", table, columnPrefix + "_email"));
+        columns.add(Column.aliased("activated", table, columnPrefix + "_activated"));
+        columns.add(Column.aliased("lang_key", table, columnPrefix + "_lang_key"));
+        columns.add(Column.aliased("image_url", table, columnPrefix + "_image_url"));
+        return columns;
     }
 }

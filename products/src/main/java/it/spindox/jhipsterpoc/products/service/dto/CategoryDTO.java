@@ -1,13 +1,12 @@
 package it.spindox.jhipsterpoc.products.service.dto;
 
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link it.spindox.jhipsterpoc.products.domain.Category} entity.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class CategoryDTO implements Serializable {
 
     private Long id;

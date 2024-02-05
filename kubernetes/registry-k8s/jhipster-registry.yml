@@ -19,7 +19,7 @@ metadata:
   namespace: jhipster-poc
 type: Opaque
 data:
-  registry-admin-password: YWRtaW4= # base64 encoded ""
+  registry-admin-password: YWRtaW4= # base64 encoded "admin"
 ---
 apiVersion: v1
 kind: Service
@@ -28,12 +28,13 @@ metadata:
   namespace: jhipster-poc
   labels:
     app: jhipster-registry
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   ports:
     - port: 8761
       name: http
   clusterIP: None
-  publishNotReadyAddresses: true
   selector:
     app: jhipster-registry
 ---
@@ -60,7 +61,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v7.4.0
+          image: jhipster/jhipster-registry:v7.1.0
           ports:
             - containerPort: 8761
           env:

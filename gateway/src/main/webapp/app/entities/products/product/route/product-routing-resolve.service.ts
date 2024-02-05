@@ -1,29 +1,30 @@
-import { inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { of, EMPTY, Observable } from 'rxjs';
+import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { IProduct } from '../product.model';
+import { IProduct, Product } from '../product.model';
 import { ProductService } from '../service/product.service';
 
-export const productResolve = (route: ActivatedRouteSnapshot): Observable<null | IProduct> => {
-  const id = route.params['id'];
-  if (id) {
-    return inject(ProductService)
-      .find(id)
-      .pipe(
-        mergeMap((product: HttpResponse<IProduct>) => {
+@Injectable({ providedIn: 'root' })
+export class ProductRoutingResolveService implements Resolve<IProduct> {
+  constructor(protected service: ProductService, protected router: Router) {}
+
+  resolve(route: ActivatedRouteSnapshot): Observable<IProduct> | Observable<never> {
+    const id = route.params['id'];
+    if (id) {
+      return this.service.find(id).pipe(
+        mergeMap((product: HttpResponse<Product>) => {
           if (product.body) {
             return of(product.body);
           } else {
-            inject(Router).navigate(['404']);
+            this.router.navigate(['404']);
             return EMPTY;
           }
-        }),
+        })
       );
+    }
+    return of(new Product());
   }
-  return of(null);
-};
-
-export default productResolve;
+}

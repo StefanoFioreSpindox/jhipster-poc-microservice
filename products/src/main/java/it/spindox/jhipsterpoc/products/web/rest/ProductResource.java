@@ -4,13 +4,13 @@ import it.spindox.jhipsterpoc.products.repository.ProductRepository;
 import it.spindox.jhipsterpoc.products.service.ProductService;
 import it.spindox.jhipsterpoc.products.service.dto.ProductDTO;
 import it.spindox.jhipsterpoc.products.web.rest.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link it.spindox.jhipsterpoc.products.domain.Product}.
  */
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api")
 public class ProductResource {
 
     private final Logger log = LoggerFactory.getLogger(ProductResource.class);
@@ -49,7 +49,7 @@ public class ProductResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new productDTO, or with status {@code 400 (Bad Request)} if the product has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/products")
     public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) throws URISyntaxException {
         log.debug("REST request to save Product : {}", productDTO);
         if (productDTO.getId() != null) {
@@ -72,7 +72,7 @@ public class ProductResource {
      * or with status {@code 500 (Internal Server Error)} if the productDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/products/{id}")
     public ResponseEntity<ProductDTO> updateProduct(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ProductDTO productDTO
@@ -89,7 +89,7 @@ public class ProductResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ProductDTO result = productService.update(productDTO);
+        ProductDTO result = productService.save(productDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, productDTO.getId().toString()))
@@ -107,7 +107,7 @@ public class ProductResource {
      * or with status {@code 500 (Internal Server Error)} if the productDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/products/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ProductDTO> partialUpdateProduct(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ProductDTO productDTO
@@ -137,7 +137,7 @@ public class ProductResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of products in body.
      */
-    @GetMapping("")
+    @GetMapping("/products")
     public List<ProductDTO> getAllProducts() {
         log.debug("REST request to get all Products");
         return productService.findAll();
@@ -149,8 +149,8 @@ public class ProductResource {
      * @param id the id of the productDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the productDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProduct(@PathVariable("id") Long id) {
+    @GetMapping("/products/{id}")
+    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long id) {
         log.debug("REST request to get Product : {}", id);
         Optional<ProductDTO> productDTO = productService.findOne(id);
         return ResponseUtil.wrapOrNotFound(productDTO);
@@ -162,8 +162,8 @@ public class ProductResource {
      * @param id the id of the productDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         log.debug("REST request to delete Product : {}", id);
         productService.delete(id);
         return ResponseEntity

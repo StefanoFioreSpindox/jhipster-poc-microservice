@@ -2,7 +2,7 @@
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
     <!--
         Added the constraints for entity Product.
     -->
@@ -12,7 +12,6 @@
                                  baseTableName="product"
                                  constraintName="fk_product__category_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="category"
-                                 />
+                                 referencedTableName="category"/>
     </changeSet>
 </databaseChangeLog>

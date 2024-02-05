@@ -4,83 +4,49 @@ services:
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod,api-docs
-      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config
       - SPRING_R2DBC_URL=r2dbc:postgresql://gateway-postgresql:5432/gateway
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://gateway-postgresql:5432/gateway
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=web_app
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=web_app
+      - JHIPSTER_SLEEP=30
       - JHIPSTER_REGISTRY_PASSWORD=admin
     ports:
       - "8080:8080"
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - http://localhost:8080/management/health
-      interval: 5s
-      timeout: 5s
-      retries: 40
-    depends_on:
-      gateway-postgresql:
-        condition: service_healthy
-      jhipster-registry:
-        condition: service_healthy
   gateway-postgresql:
-    image: postgres:16.1
+    image: postgres:13.4
     environment:
       - POSTGRES_USER=gateway
       - POSTGRES_PASSWORD=
       - POSTGRES_HOST_AUTH_METHOD=trust
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -U $${POSTGRES_USER}
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   products:
     image: products
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod,api-docs
-      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka
       - SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config
       - SPRING_DATASOURCE_URL=jdbc:postgresql://products-postgresql:5432/products
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://products-postgresql:5432/products
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=internal
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=internal
+      - JHIPSTER_SLEEP=30
       - JHIPSTER_REGISTRY_PASSWORD=admin
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - http://localhost:8081/management/health
-      interval: 5s
-      timeout: 5s
-      retries: 40
-    depends_on:
-      products-postgresql:
-        condition: service_healthy
-      jhipster-registry:
-        condition: service_healthy
   products-postgresql:
-    image: postgres:16.1
+    image: postgres:13.4
     environment:
       - POSTGRES_USER=products
       - POSTGRES_PASSWORD=
       - POSTGRES_HOST_AUTH_METHOD=trust
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -U $${POSTGRES_USER}
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v7.4.0
+    image: jhipster/jhipster-registry:v7.1.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the "dev" and "native"
@@ -89,7 +55,8 @@ services:
     # http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
-      - SPRING_PROFILES_ACTIVE=dev
+      - JHIPSTER_SLEEP=20
+      - SPRING_PROFILES_ACTIVE=dev,oauth2
       - SPRING_SECURITY_USER_PASSWORD=admin
       - JHIPSTER_REGISTRY_PASSWORD=admin
       - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=native
@@ -97,10 +64,32 @@ services:
       # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=git
       # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_URI=https://github.com/jhipster/jhipster-registry/
       # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_PATHS=central-config
+      # For Keycloak to work, you need to add '127.0.0.1 keycloak' to your hosts file
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=jhipster-registry
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=jhipster-registry
     ports:
       - 8761:8761
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/management/health"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  keycloak:
+    image: jboss/keycloak:15.0.2
+    command:
+      [
+        "-b",
+        "0.0.0.0",
+        "-Dkeycloak.migration.action=import",
+        "-Dkeycloak.migration.provider=dir",
+        "-Dkeycloak.migration.dir=/opt/jboss/keycloak/realm-config",
+        "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING",
+        "-Djboss.socket.binding.port-offset=1000",
+        "-Dkeycloak.profile.feature.upload_scripts=enabled",
+      ]
+    volumes:
+      - ./realm-config:/opt/jboss/keycloak/realm-config
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=h2
+    ports:
+      - 9080:9080
+      - 9443:9443
+      - 10990:10990

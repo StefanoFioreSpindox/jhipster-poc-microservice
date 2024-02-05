@@ -72,7 +72,7 @@ spec:
               value: jdbc:postgresql://gateway-postgresql.jhipster-poc.svc.cluster.local:5432/gateway
             - name: SPRING_R2DBC_URL
               value: r2dbc:postgresql://gateway-postgresql.jhipster-poc.svc.cluster.local:5432/gateway
-            - name: MANAGEMENT_TRACING_BAGGAGE_REMOTE_FIELDS
+            - name: SPRING_SLEUTH_PROPAGATION_KEYS
               value: "x-request-id,x-ot-span-context"
             - name: JAVA_OPTS
               value: " -Xmx256m -Xms256m"

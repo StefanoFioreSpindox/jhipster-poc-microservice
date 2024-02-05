@@ -1,0 +1,118 @@
+application {
+  config {
+    applicationType gateway
+    authenticationType oauth2
+    baseName gateway
+    blueprints []
+    buildTool maven
+    cacheProvider no
+    clientFramework angularX
+    clientPackageManager npm
+    clientTheme none
+    creationTimestamp 1707150744076
+    databaseType sql
+    devDatabaseType h2Disk
+    dtoSuffix DTO
+    enableGradleEnterprise false
+    enableHibernateCache false
+    enableSwaggerCodegen false
+    enableTranslation true
+    gradleEnterpriseHost ""
+    jhiPrefix jhi
+    jhipsterVersion "7.3.0"
+    languages [en, it]
+    messageBroker false
+    nativeLanguage en
+    packageName it.spindox.jhipsterpoc.gateway
+    prodDatabaseType postgresql
+    reactive true
+    searchEngine false
+    serverPort 8080
+    serviceDiscoveryType eureka
+    skipClient false
+    skipServer false
+    skipUserManagement true
+    testFrameworks []
+    websocket false
+    withAdminUi true
+  }
+  entities Category, Product
+}
+
+application {
+  config {
+    applicationType microservice
+    authenticationType oauth2
+    baseName products
+    blueprints []
+    buildTool maven
+    cacheProvider hazelcast
+    clientPackageManager npm
+    creationTimestamp 1707144867510
+    databaseType sql
+    devDatabaseType h2Disk
+    dtoSuffix DTO
+    enableGradleEnterprise false
+    enableHibernateCache true
+    enableSwaggerCodegen false
+    enableTranslation true
+    gradleEnterpriseHost ""
+    jhiPrefix jhi
+    jhipsterVersion "7.3.0"
+    languages [en, it]
+    messageBroker false
+    nativeLanguage en
+    packageName it.spindox.jhipsterpoc.products
+    prodDatabaseType postgresql
+    reactive false
+    searchEngine false
+    serverPort 8081
+    serviceDiscoveryType eureka
+    skipClient true
+    skipUserManagement true
+    testFrameworks []
+    websocket false
+  }
+  entities Category, Product
+}
+
+@ChangelogDate("20240122150625")
+entity Category {
+  name String unique
+  description String
+}
+
+@ChangelogDate("20240119132644")
+entity Product {
+  name String unique
+  description String
+  quantity Integer
+}
+
+relationship OneToMany {
+  Category{product(name)} to Product
+}
+
+dto Category, Product with mapstruct
+service Category, Product with serviceImpl
+microservice Category, Product with products
+clientRootFolder Category, Product with products
+
+deployment {
+  deploymentType docker-compose
+  serviceDiscoveryType eureka
+  appsFolders [gateway, products]
+  dockerRepositoryName "stefanofiorespindox"
+}
+
+deployment {
+  deploymentType kubernetes
+  serviceDiscoveryType eureka
+  appsFolders [gateway, products]
+  dockerRepositoryName "stefanofiorespindox"
+  kubernetesServiceType Ingress
+  ingressType nginx
+  ingressDomain "spindox.dev"
+  monitoring no
+  kubernetesNamespace jhipster-poc
+}

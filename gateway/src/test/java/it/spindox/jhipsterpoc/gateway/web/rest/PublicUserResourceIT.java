@@ -1,12 +1,15 @@
 package it.spindox.jhipsterpoc.gateway.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import it.spindox.jhipsterpoc.gateway.IntegrationTest;
+import it.spindox.jhipsterpoc.gateway.config.Constants;
+import it.spindox.jhipsterpoc.gateway.config.TestSecurityConfiguration;
 import it.spindox.jhipsterpoc.gateway.domain.User;
-import it.spindox.jhipsterpoc.gateway.repository.EntityManager;
 import it.spindox.jhipsterpoc.gateway.repository.UserRepository;
 import it.spindox.jhipsterpoc.gateway.security.AuthoritiesConstants;
+import it.spindox.jhipsterpoc.gateway.service.EntityManager;
 import it.spindox.jhipsterpoc.gateway.service.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +20,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
- * Integration tests for the {@link PublicUserResource} REST controller.
+ * Integration tests for the {@link UserResource} REST controller.
  */
-@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_TIMEOUT)
+@AutoConfigureWebTestClient
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 @IntegrationTest
 class PublicUserResourceIT {
@@ -38,6 +41,11 @@ class PublicUserResourceIT {
     private User user;
 
     @BeforeEach
+    public void setupCsrf() {
+        webTestClient = webTestClient.mutateWith(csrf());
+    }
+
+    @BeforeEach
     public void initTest() {
         user = UserResourceIT.initTestUser(userRepository, em);
     }
@@ -45,12 +53,12 @@ class PublicUserResourceIT {
     @Test
     void getAllPublicUsers() {
         // Initialize the database
-        userRepository.save(user).block();
+        userRepository.create(user).block();
 
         // Get all the users
         UserDTO foundUser = webTestClient
             .get()
-            .uri("/api/users?sort=id,desc")
+            .uri("/api/users?sort=id,DESC")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -82,34 +90,5 @@ class PublicUserResourceIT {
             .hasJsonPath()
             .jsonPath("$[?(@=='" + AuthoritiesConstants.USER + "')]")
             .hasJsonPath();
-    }
-
-    @Test
-    void getAllUsersSortedByParameters() throws Exception {
-        // Initialize the database
-        userRepository.save(user).block();
-
-        webTestClient
-            .get()
-            .uri("/api/users?sort=resetKey,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-        webTestClient
-            .get()
-            .uri("/api/users?sort=password,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-        webTestClient
-            .get()
-            .uri("/api/users?sort=resetKey,desc&sort=id,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-        webTestClient.get().uri("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk();
     }
 }

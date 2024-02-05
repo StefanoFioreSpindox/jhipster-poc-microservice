@@ -9,19 +9,15 @@ import { translationNotFoundMessage } from 'app/config/translation.config';
  * A wrapper directive on top of the translate pipe as the inbuilt translate directive from ngx-translate is too verbose and buggy
  */
 @Directive({
-  standalone: true,
   selector: '[jhiTranslate]',
 })
-export default class TranslateDirective implements OnChanges, OnInit, OnDestroy {
+export class TranslateDirective implements OnChanges, OnInit, OnDestroy {
   @Input() jhiTranslate!: string;
   @Input() translateValues?: { [key: string]: unknown };
 
-  private readonly directiveDestroyed = new Subject();
+  private readonly directiveDestroyed = new Subject<never>();
 
-  constructor(
-    private el: ElementRef,
-    private translateService: TranslateService,
-  ) {}
+  constructor(private el: ElementRef, private translateService: TranslateService) {}
 
   ngOnInit(): void {
     this.translateService.onLangChange.pipe(takeUntil(this.directiveDestroyed)).subscribe(() => {
@@ -37,7 +33,7 @@ export default class TranslateDirective implements OnChanges, OnInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
-    this.directiveDestroyed.next(null);
+    this.directiveDestroyed.next();
     this.directiveDestroyed.complete();
   }
 
@@ -45,11 +41,11 @@ export default class TranslateDirective implements OnChanges, OnInit, OnDestroy 
     this.translateService
       .get(this.jhiTranslate, this.translateValues)
       .pipe(takeUntil(this.directiveDestroyed))
-      .subscribe({
-        next: value => {
+      .subscribe(
+        value => {
           this.el.nativeElement.innerHTML = value;
         },
-        error: () => `${translationNotFoundMessage}[${this.jhiTranslate}]`,
-      });
+        () => `${translationNotFoundMessage}[${this.jhiTranslate}]`
+      );
   }
 }

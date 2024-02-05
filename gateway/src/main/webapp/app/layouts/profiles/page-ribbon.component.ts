@@ -2,23 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import SharedModule from 'app/shared/shared.module';
 import { ProfileService } from './profile.service';
 
 @Component({
-  standalone: true,
   selector: 'jhi-page-ribbon',
   template: `
-    @if (ribbonEnv$ | async; as ribbonEnv) {
-      <div class="ribbon">
-        <a href="" jhiTranslate="global.ribbon.{{ ribbonEnv }}">{{ { dev: 'Development' }[ribbonEnv] || '' }}</a>
-      </div>
-    }
+    <div class="ribbon" *ngIf="ribbonEnv$ | async as ribbonEnv">
+      <a href="" jhiTranslate="global.ribbon.{{ ribbonEnv }}">{{ ribbonEnv }}</a>
+    </div>
   `,
-  styleUrl: './page-ribbon.component.scss',
-  imports: [SharedModule],
+  styleUrls: ['./page-ribbon.component.scss'],
 })
-export default class PageRibbonComponent implements OnInit {
+export class PageRibbonComponent implements OnInit {
   ribbonEnv$?: Observable<string | undefined>;
 
   constructor(private profileService: ProfileService) {}

@@ -1,9 +1,9 @@
 package it.spindox.jhipsterpoc.products.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import javax.persistence.*;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -13,7 +13,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "product")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,7 +32,7 @@ public class Product implements Serializable {
     @Column(name = "quantity")
     private Integer quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonIgnoreProperties(value = { "products" }, allowSetters = true)
     private Category category;
 
@@ -114,7 +113,7 @@ public class Product implements Serializable {
         if (!(o instanceof Product)) {
             return false;
         }
-        return getId() != null && getId().equals(((Product) o).getId());
+        return id != null && id.equals(((Product) o).id);
     }
 
     @Override

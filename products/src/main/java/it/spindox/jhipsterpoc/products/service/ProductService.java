@@ -17,14 +17,6 @@ public interface ProductService {
     ProductDTO save(ProductDTO productDTO);
 
     /**
-     * Updates a product.
-     *
-     * @param productDTO the entity to update.
-     * @return the persisted entity.
-     */
-    ProductDTO update(ProductDTO productDTO);
-
-    /**
      * Partially updates a product.
      *
      * @param productDTO the entity to update partially.

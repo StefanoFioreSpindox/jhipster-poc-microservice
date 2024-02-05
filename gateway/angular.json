@@ -26,14 +26,22 @@
             "outputPath": "target/classes/static/",
             "index": "src/main/webapp/index.html",
             "main": "src/main/webapp/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": "src/main/webapp/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/main/webapp/content",
               "src/main/webapp/favicon.ico",
               "src/main/webapp/manifest.webapp",
-              "src/main/webapp/robots.txt"
+              "src/main/webapp/robots.txt",
+              {
+                "glob": "*.{js,css,html,png}",
+                "input": "./node_modules/swagger-ui-dist",
+                "output": "swagger-ui",
+                "ignore": ["**/index.html"]
+              },
+              { "glob": "axios.min.js", "input": "./node_modules/axios/dist", "output": "swagger-ui" },
+              { "glob": "**/*", "input": "src/main/webapp/swagger-ui/", "output": "swagger-ui" }
             ],
             "styles": ["src/main/webapp/content/scss/vendor.scss", "src/main/webapp/content/scss/global.scss"],
             "scripts": []
@@ -76,15 +84,15 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "buildTarget": "gateway:build:development",
+            "browserTarget": "gateway:build:development",
             "port": 4200
           },
           "configurations": {
             "production": {
-              "buildTarget": "gateway:build:production"
+              "browserTarget": "gateway:build:production"
             },
             "development": {
-              "buildTarget": "gateway:build:development"
+              "browserTarget": "gateway:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -92,19 +100,14 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.conf.js",
-            "tsConfig": "tsconfig.spec.json"
+            "configPath": "jest.conf.js"
           }
         }
       }
     }
   },
+  "defaultProject": "gateway",
   "cli": {
-    "cache": {
-      "enabled": true,
-      "path": "./target/angular/",
-      "environment": "all"
-    },
     "packageManager": "npm"
   }
 }

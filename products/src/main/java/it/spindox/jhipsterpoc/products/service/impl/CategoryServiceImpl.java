@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link it.spindox.jhipsterpoc.products.domain.Category}.
+ * Service Implementation for managing {@link Category}.
  */
 @Service
 @Transactional
@@ -35,14 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO save(CategoryDTO categoryDTO) {
         log.debug("Request to save Category : {}", categoryDTO);
-        Category category = categoryMapper.toEntity(categoryDTO);
-        category = categoryRepository.save(category);
-        return categoryMapper.toDto(category);
-    }
-
-    @Override
-    public CategoryDTO update(CategoryDTO categoryDTO) {
-        log.debug("Request to update Category : {}", categoryDTO);
         Category category = categoryMapper.toEntity(categoryDTO);
         category = categoryRepository.save(category);
         return categoryMapper.toDto(category);

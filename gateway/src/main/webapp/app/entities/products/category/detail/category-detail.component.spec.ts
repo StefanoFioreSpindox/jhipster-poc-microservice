@@ -1,38 +1,38 @@
-import { TestBed } from '@angular/core/testing';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { RouterTestingHarness, RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { CategoryDetailComponent } from './category-detail.component';
 
-describe('Category Management Detail Component', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [CategoryDetailComponent, RouterTestingModule.withRoutes([], { bindToComponentInputs: true })],
-      providers: [
-        provideRouter(
-          [
-            {
-              path: '**',
-              component: CategoryDetailComponent,
-              resolve: { category: () => of({ id: 123 }) },
-            },
-          ],
-          withComponentInputBinding(),
-        ),
-      ],
-    })
-      .overrideTemplate(CategoryDetailComponent, '')
-      .compileComponents();
-  });
+describe('Component Tests', () => {
+  describe('Category Management Detail Component', () => {
+    let comp: CategoryDetailComponent;
+    let fixture: ComponentFixture<CategoryDetailComponent>;
 
-  describe('OnInit', () => {
-    it('Should load category on init', async () => {
-      const harness = await RouterTestingHarness.create();
-      const instance = await harness.navigateByUrl('/', CategoryDetailComponent);
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        declarations: [CategoryDetailComponent],
+        providers: [
+          {
+            provide: ActivatedRoute,
+            useValue: { data: of({ category: { id: 123 } }) },
+          },
+        ],
+      })
+        .overrideTemplate(CategoryDetailComponent, '')
+        .compileComponents();
+      fixture = TestBed.createComponent(CategoryDetailComponent);
+      comp = fixture.componentInstance;
+    });
 
-      // THEN
-      expect(instance.category).toEqual(expect.objectContaining({ id: 123 }));
+    describe('OnInit', () => {
+      it('Should load category on init', () => {
+        // WHEN
+        comp.ngOnInit();
+
+        // THEN
+        expect(comp.category).toEqual(expect.objectContaining({ id: 123 }));
+      });
     });
   });
 });

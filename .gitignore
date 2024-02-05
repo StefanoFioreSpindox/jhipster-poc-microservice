@@ -1,4 +1,10 @@
 ######################
+# Project Specific
+######################
+/target/classes/static/**
+/src/test/javascript/coverage/
+
+######################
 # Node
 ######################
 /node/
@@ -7,7 +13,6 @@ node_modules/
 npm-debug.log.*
 /.awcache/*
 /.cache-loader/*
-package-lock.json
 
 ######################
 # SASS
@@ -31,6 +36,7 @@ local.properties
 .settings/
 .loadpath
 .factorypath
+/src/main/resources/rebel.xml
 
 # External tool builders
 .externalToolBuilders/**

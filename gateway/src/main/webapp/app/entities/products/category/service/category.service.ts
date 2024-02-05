@@ -5,9 +5,7 @@ import { Observable } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { ICategory, NewCategory } from '../category.model';
-
-export type PartialUpdateCategory = Partial<ICategory> & Pick<ICategory, 'id'>;
+import { ICategory, getCategoryIdentifier } from '../category.model';
 
 export type EntityResponseType = HttpResponse<ICategory>;
 export type EntityArrayResponseType = HttpResponse<ICategory[]>;
@@ -16,21 +14,20 @@ export type EntityArrayResponseType = HttpResponse<ICategory[]>;
 export class CategoryService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/categories', 'products');
 
-  constructor(
-    protected http: HttpClient,
-    protected applicationConfigService: ApplicationConfigService,
-  ) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
 
-  create(category: NewCategory): Observable<EntityResponseType> {
+  create(category: ICategory): Observable<EntityResponseType> {
     return this.http.post<ICategory>(this.resourceUrl, category, { observe: 'response' });
   }
 
   update(category: ICategory): Observable<EntityResponseType> {
-    return this.http.put<ICategory>(`${this.resourceUrl}/${this.getCategoryIdentifier(category)}`, category, { observe: 'response' });
+    return this.http.put<ICategory>(`${this.resourceUrl}/${getCategoryIdentifier(category) as number}`, category, { observe: 'response' });
   }
 
-  partialUpdate(category: PartialUpdateCategory): Observable<EntityResponseType> {
-    return this.http.patch<ICategory>(`${this.resourceUrl}/${this.getCategoryIdentifier(category)}`, category, { observe: 'response' });
+  partialUpdate(category: ICategory): Observable<EntityResponseType> {
+    return this.http.patch<ICategory>(`${this.resourceUrl}/${getCategoryIdentifier(category) as number}`, category, {
+      observe: 'response',
+    });
   }
 
   find(id: number): Observable<EntityResponseType> {
@@ -46,24 +43,13 @@ export class CategoryService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  getCategoryIdentifier(category: Pick<ICategory, 'id'>): number {
-    return category.id;
-  }
-
-  compareCategory(o1: Pick<ICategory, 'id'> | null, o2: Pick<ICategory, 'id'> | null): boolean {
-    return o1 && o2 ? this.getCategoryIdentifier(o1) === this.getCategoryIdentifier(o2) : o1 === o2;
-  }
-
-  addCategoryToCollectionIfMissing<Type extends Pick<ICategory, 'id'>>(
-    categoryCollection: Type[],
-    ...categoriesToCheck: (Type | null | undefined)[]
-  ): Type[] {
-    const categories: Type[] = categoriesToCheck.filter(isPresent);
+  addCategoryToCollectionIfMissing(categoryCollection: ICategory[], ...categoriesToCheck: (ICategory | null | undefined)[]): ICategory[] {
+    const categories: ICategory[] = categoriesToCheck.filter(isPresent);
     if (categories.length > 0) {
-      const categoryCollectionIdentifiers = categoryCollection.map(categoryItem => this.getCategoryIdentifier(categoryItem)!);
+      const categoryCollectionIdentifiers = categoryCollection.map(categoryItem => getCategoryIdentifier(categoryItem)!);
       const categoriesToAdd = categories.filter(categoryItem => {
-        const categoryIdentifier = this.getCategoryIdentifier(categoryItem);
-        if (categoryCollectionIdentifiers.includes(categoryIdentifier)) {
+        const categoryIdentifier = getCategoryIdentifier(categoryItem);
+        if (categoryIdentifier == null || categoryCollectionIdentifiers.includes(categoryIdentifier)) {
           return false;
         }
         categoryCollectionIdentifiers.push(categoryIdentifier);

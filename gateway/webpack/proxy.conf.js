@@ -1,8 +1,19 @@
 function setupProxy({ tls }) {
-  const serverResources = ['/api', '/services', '/management', '/v3/api-docs', '/h2-console', '/auth', '/health'];
   const conf = [
     {
-      context: serverResources,
+      context: [
+        '/api',
+        '/services',
+        '/management',
+        '/swagger-resources',
+        '/v2/api-docs',
+        '/v3/api-docs',
+        '/h2-console',
+        '/oauth2',
+        '/login',
+        '/auth',
+        '/health',
+      ],
       target: `http${tls ? 's' : ''}://localhost:8080`,
       secure: false,
       changeOrigin: tls,

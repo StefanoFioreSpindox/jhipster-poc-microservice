@@ -1,11 +1,13 @@
 package it.spindox.jhipsterpoc.gateway.web.rest.errors;
 
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+
 import it.spindox.jhipsterpoc.gateway.IntegrationTest;
-import org.hamcrest.core.AnyOf;
-import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -15,12 +17,17 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  * Integration tests {@link ExceptionTranslator} controller advice.
  */
 @WithMockUser
-@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_TIMEOUT)
+@AutoConfigureWebTestClient
 @IntegrationTest
 class ExceptionTranslatorIT {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @BeforeEach
+    public void setupCsrf() {
+        webTestClient = webTestClient.mutateWith(csrf());
+    }
 
     @Test
     void testConcurrencyFailure() {
@@ -121,7 +128,7 @@ class ExceptionTranslatorIT {
             .jsonPath("$.path")
             .isEqualTo("/api/exception-translator-test/unauthorized")
             .jsonPath("$.detail")
-            .value(AnyOf.anyOf(IsEqual.equalTo("test authentication failed!"), IsEqual.equalTo("Invalid credentials")));
+            .isEqualTo("test authentication failed!");
     }
 
     @Test
@@ -138,7 +145,7 @@ class ExceptionTranslatorIT {
             .jsonPath("$.message")
             .isEqualTo("error.http.405")
             .jsonPath("$.detail")
-            .isEqualTo("405 METHOD_NOT_ALLOWED \"Request method 'POST' is not supported.\"");
+            .isEqualTo("405 METHOD_NOT_ALLOWED \"Request method 'POST' not supported\"");
     }
 
     @Test

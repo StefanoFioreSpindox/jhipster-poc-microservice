@@ -1,40 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
-import SharedModule from 'app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { ICategory } from '../category.model';
+import { ICategory, Category } from '../category.model';
 import { CategoryService } from '../service/category.service';
-import { CategoryFormService, CategoryFormGroup } from './category-form.service';
 
 @Component({
-  standalone: true,
   selector: 'jhi-category-update',
   templateUrl: './category-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
 })
 export class CategoryUpdateComponent implements OnInit {
   isSaving = false;
-  category: ICategory | null = null;
 
-  editForm: CategoryFormGroup = this.categoryFormService.createCategoryFormGroup();
+  editForm = this.fb.group({
+    id: [],
+    name: [null, []],
+    description: [],
+  });
 
-  constructor(
-    protected categoryService: CategoryService,
-    protected categoryFormService: CategoryFormService,
-    protected activatedRoute: ActivatedRoute,
-  ) {}
+  constructor(protected categoryService: CategoryService, protected activatedRoute: ActivatedRoute, protected fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ category }) => {
-      this.category = category;
-      if (category) {
-        this.updateForm(category);
-      }
+      this.updateForm(category);
     });
   }
 
@@ -44,8 +35,8 @@ export class CategoryUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const category = this.categoryFormService.getCategory(this.editForm);
-    if (category.id !== null) {
+    const category = this.createFromForm();
+    if (category.id !== undefined) {
       this.subscribeToSaveResponse(this.categoryService.update(category));
     } else {
       this.subscribeToSaveResponse(this.categoryService.create(category));
@@ -53,10 +44,10 @@ export class CategoryUpdateComponent implements OnInit {
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ICategory>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
-    });
+    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
   }
 
   protected onSaveSuccess(): void {
@@ -72,7 +63,19 @@ export class CategoryUpdateComponent implements OnInit {
   }
 
   protected updateForm(category: ICategory): void {
-    this.category = category;
-    this.categoryFormService.resetForm(this.editForm, category);
+    this.editForm.patchValue({
+      id: category.id,
+      name: category.name,
+      description: category.description,
+    });
+  }
+
+  protected createFromForm(): ICategory {
+    return {
+      ...new Category(),
+      id: this.editForm.get(['id'])!.value,
+      name: this.editForm.get(['name'])!.value,
+      description: this.editForm.get(['description'])!.value,
+    };
   }
 }

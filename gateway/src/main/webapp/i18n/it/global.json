@@ -7,9 +7,7 @@
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entità",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "productsProduct": "Product",
-        "productsCategory": "Category"
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {
         "main": "Utente",
@@ -100,8 +98,7 @@
       "edit": "Modifica",
       "open": "Open",
       "save": "Salva",
-      "view": "Visualizza",
-      "show": "Show {{otherEntity}}"
+      "view": "Visualizza"
     },
     "detail": {
       "field": "Campo",
@@ -121,11 +118,6 @@
       "pattern": "Questo campo dovrebbe corrispondere al modello {{ pattern }}.",
       "number": "Questo campo dovrebbe essere un numero.",
       "datetimelocal": "Questo campo dovrebbe essere data e ora."
-    },
-    "filters": {
-      "set": "Following filters are set",
-      "clear": "Clear filter",
-      "clearAll": "Clear all filters"
     }
   },
   "error": {

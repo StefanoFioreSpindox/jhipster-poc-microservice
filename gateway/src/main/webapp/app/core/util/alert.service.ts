@@ -30,11 +30,7 @@ export class AlertService {
   private alertId = 0;
   private alerts: Alert[] = [];
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private ngZone: NgZone,
-    private translateService: TranslateService,
-  ) {}
+  constructor(private sanitizer: DomSanitizer, private ngZone: NgZone, private translateService: TranslateService) {}
 
   clear(): void {
     this.alerts = [];
@@ -74,9 +70,15 @@ export class AlertService {
     (extAlerts ?? this.alerts).push(alert);
 
     if (alert.timeout > 0) {
-      setTimeout(() => {
-        this.closeAlert(alert.id!, extAlerts ?? this.alerts);
-      }, alert.timeout);
+      // Workaround protractor waiting for setTimeout.
+      // Reference https://www.protractortest.org/#/timeouts
+      this.ngZone.runOutsideAngular(() => {
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.closeAlert(alert.id!, extAlerts ?? this.alerts);
+          });
+        }, alert.timeout);
+      });
     }
 
     return alert;

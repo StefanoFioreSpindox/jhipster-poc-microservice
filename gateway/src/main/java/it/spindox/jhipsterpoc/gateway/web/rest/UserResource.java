@@ -1,36 +1,25 @@
 package it.spindox.jhipsterpoc.gateway.web.rest;
 
 import it.spindox.jhipsterpoc.gateway.config.Constants;
-import it.spindox.jhipsterpoc.gateway.domain.User;
-import it.spindox.jhipsterpoc.gateway.repository.UserRepository;
 import it.spindox.jhipsterpoc.gateway.security.AuthoritiesConstants;
-import it.spindox.jhipsterpoc.gateway.service.MailService;
 import it.spindox.jhipsterpoc.gateway.service.UserService;
 import it.spindox.jhipsterpoc.gateway.service.dto.AdminUserDTO;
-import it.spindox.jhipsterpoc.gateway.web.rest.errors.BadRequestAlertException;
-import it.spindox.jhipsterpoc.gateway.web.rest.errors.EmailAlreadyUsedException;
-import it.spindox.jhipsterpoc.gateway.web.rest.errors.LoginAlreadyUsedException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import javax.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.ForwardedHeaderUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
@@ -64,22 +53,6 @@ import tech.jhipster.web.util.PaginationUtil;
 @RequestMapping("/api/admin")
 public class UserResource {
 
-    private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList(
-            "id",
-            "login",
-            "firstName",
-            "lastName",
-            "email",
-            "activated",
-            "langKey",
-            "createdBy",
-            "createdDate",
-            "lastModifiedBy",
-            "lastModifiedDate"
-        )
-    );
-
     private final Logger log = LoggerFactory.getLogger(UserResource.class);
 
     @Value("${jhipster.clientApp.name}")
@@ -87,102 +60,8 @@ public class UserResource {
 
     private final UserService userService;
 
-    private final UserRepository userRepository;
-
-    private final MailService mailService;
-
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
+    public UserResource(UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
-        this.mailService = mailService;
-    }
-
-    /**
-     * {@code POST  /admin/users}  : Creates a new user.
-     * <p>
-     * Creates a new user if the login and email are not already used, and sends an
-     * mail with an activation link.
-     * The user needs to be activated on creation.
-     *
-     * @param userDTO the user to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new user, or with status {@code 400 (Bad Request)} if the login or email is already in use.
-     * @throws BadRequestAlertException {@code 400 (Bad Request)} if the login or email is already in use.
-     */
-    @PostMapping("/users")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<User>> createUser(@Valid @RequestBody AdminUserDTO userDTO) {
-        log.debug("REST request to save User : {}", userDTO);
-
-        if (userDTO.getId() != null) {
-            throw new BadRequestAlertException("A new user cannot already have an ID", "userManagement", "idexists");
-            // Lowercase the user login before comparing with database
-        }
-        return userRepository
-            .findOneByLogin(userDTO.getLogin().toLowerCase())
-            .hasElement()
-            .flatMap(loginExists -> {
-                if (Boolean.TRUE.equals(loginExists)) {
-                    return Mono.error(new LoginAlreadyUsedException());
-                }
-                return userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-            })
-            .hasElement()
-            .flatMap(emailExists -> {
-                if (Boolean.TRUE.equals(emailExists)) {
-                    return Mono.error(new EmailAlreadyUsedException());
-                }
-                return userService.createUser(userDTO);
-            })
-            .doOnSuccess(mailService::sendCreationEmail)
-            .map(user -> {
-                try {
-                    return ResponseEntity
-                        .created(new URI("/api/admin/users/" + user.getLogin()))
-                        .headers(HeaderUtil.createAlert(applicationName, "userManagement.created", user.getLogin()))
-                        .body(user);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-    }
-
-    /**
-     * {@code PUT /admin/users} : Updates an existing User.
-     *
-     * @param userDTO the user to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated user.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already in use.
-     * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
-     */
-    @PutMapping("/users")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<AdminUserDTO>> updateUser(@Valid @RequestBody AdminUserDTO userDTO) {
-        log.debug("REST request to update User : {}", userDTO);
-        return userRepository
-            .findOneByEmailIgnoreCase(userDTO.getEmail())
-            .filter(user -> !user.getId().equals(userDTO.getId()))
-            .hasElement()
-            .flatMap(emailExists -> {
-                if (Boolean.TRUE.equals(emailExists)) {
-                    return Mono.error(new EmailAlreadyUsedException());
-                }
-                return userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
-            })
-            .filter(user -> !user.getId().equals(userDTO.getId()))
-            .hasElement()
-            .flatMap(loginExists -> {
-                if (Boolean.TRUE.equals(loginExists)) {
-                    return Mono.error(new LoginAlreadyUsedException());
-                }
-                return userService.updateUser(userDTO);
-            })
-            .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-            .map(user ->
-                ResponseEntity
-                    .ok()
-                    .headers(HeaderUtil.createAlert(applicationName, "userManagement.updated", userDTO.getLogin()))
-                    .body(user)
-            );
     }
 
     /**
@@ -194,29 +73,14 @@ public class UserResource {
      */
     @GetMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<Flux<AdminUserDTO>>> getAllUsers(
-        @org.springdoc.core.annotations.ParameterObject ServerHttpRequest request,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
-    ) {
+    public Mono<ResponseEntity<Flux<AdminUserDTO>>> getAllUsers(ServerHttpRequest request, Pageable pageable) {
         log.debug("REST request to get all User for an admin");
-        if (!onlyContainsAllowedProperties(pageable)) {
-            return Mono.just(ResponseEntity.badRequest().build());
-        }
 
         return userService
             .countManagedUsers()
             .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
-            .map(page ->
-                PaginationUtil.generatePaginationHttpHeaders(
-                    ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
-                    page
-                )
-            )
+            .map(page -> PaginationUtil.generatePaginationHttpHeaders(UriComponentsBuilder.fromHttpRequest(request), page))
             .map(headers -> ResponseEntity.ok().headers(headers).body(userService.getAllManagedUsers(pageable)));
-    }
-
-    private boolean onlyContainsAllowedProperties(Pageable pageable) {
-        return pageable.getSort().stream().map(Sort.Order::getProperty).allMatch(ALLOWED_ORDERED_PROPERTIES::contains);
     }
 
     /**
@@ -227,30 +91,11 @@ public class UserResource {
      */
     @GetMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<AdminUserDTO> getUser(@PathVariable("login") String login) {
+    public Mono<AdminUserDTO> getUser(@PathVariable String login) {
         log.debug("REST request to get User : {}", login);
         return userService
             .getUserWithAuthoritiesByLogin(login)
             .map(AdminUserDTO::new)
             .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
-    }
-
-    /**
-     * {@code DELETE /admin/users/:login} : delete the "login" User.
-     *
-     * @param login the login of the user to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
-    @DeleteMapping("/users/{login}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<Void>> deleteUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
-        log.debug("REST request to delete User: {}", login);
-        return userService
-            .deleteUser(login)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build()
-                )
-            );
     }
 }

@@ -9,12 +9,8 @@ useTabs: false
 arrowParens: avoid
 
 # jsx and tsx rules:
-bracketSameLine: false
+jsxBracketSameLine: false
 
-plugins:
-  - prettier-plugin-packagejson
-  - prettier-plugin-java
-  
 # java rules:
 overrides:
   - files: "*.java"

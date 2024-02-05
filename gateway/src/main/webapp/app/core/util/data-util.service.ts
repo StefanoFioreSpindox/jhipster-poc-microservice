@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable, Observer } from 'rxjs';
@@ -31,7 +30,7 @@ export class DataUtils {
   openFile(data: string, contentType: string | null | undefined): void {
     contentType = contentType ?? '';
 
-    const byteCharacters = Buffer.from(data, 'base64').toString('binary');
+    const byteCharacters = atob(data);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -55,7 +54,7 @@ export class DataUtils {
    * @param editForm the form group where the input field is located
    * @param field the field name to set the file's 'base 64 data' on
    * @param isImage boolean representing if the file represented by the event is an image
-   * @returns an observable that loads file to form field and completes if successful
+   * @returns an observable that loads file to form field and completes if sussessful
    *      or returns error as FileLoadError on failure
    */
   loadFileToForm(event: Event, editForm: FormGroup, field: string, isImage: boolean): Observable<void> {
@@ -99,7 +98,7 @@ export class DataUtils {
     const fileReader: FileReader = new FileReader();
     fileReader.onload = (e: ProgressEvent<FileReader>) => {
       if (typeof e.target?.result === 'string') {
-        const base64Data: string = e.target.result.substring(e.target.result.indexOf('base64,') + 'base64,'.length);
+        const base64Data: string = e.target.result.substr(e.target.result.indexOf('base64,') + 'base64,'.length);
         callback(base64Data);
       }
     };
@@ -125,6 +124,6 @@ export class DataUtils {
   }
 
   private formatAsBytes(size: number): string {
-    return size.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' bytes'; // NOSONAR
+    return size.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' bytes';
   }
 }

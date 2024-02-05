@@ -1,11 +1,11 @@
 package it.spindox.jhipsterpoc.products.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.*;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -15,7 +15,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "category")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,7 +31,7 @@ public class Category implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    @OneToMany(mappedBy = "category")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "category" }, allowSetters = true)
     private Set<Product> products = new HashSet<>();
@@ -119,7 +118,7 @@ public class Category implements Serializable {
         if (!(o instanceof Category)) {
             return false;
         }
-        return getId() != null && getId().equals(((Category) o).getId());
+        return id != null && id.equals(((Category) o).id);
     }
 
     @Override

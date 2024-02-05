@@ -5,9 +5,7 @@ import { Observable } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IProduct, NewProduct } from '../product.model';
-
-export type PartialUpdateProduct = Partial<IProduct> & Pick<IProduct, 'id'>;
+import { IProduct, getProductIdentifier } from '../product.model';
 
 export type EntityResponseType = HttpResponse<IProduct>;
 export type EntityArrayResponseType = HttpResponse<IProduct[]>;
@@ -16,21 +14,18 @@ export type EntityArrayResponseType = HttpResponse<IProduct[]>;
 export class ProductService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/products', 'products');
 
-  constructor(
-    protected http: HttpClient,
-    protected applicationConfigService: ApplicationConfigService,
-  ) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
 
-  create(product: NewProduct): Observable<EntityResponseType> {
+  create(product: IProduct): Observable<EntityResponseType> {
     return this.http.post<IProduct>(this.resourceUrl, product, { observe: 'response' });
   }
 
   update(product: IProduct): Observable<EntityResponseType> {
-    return this.http.put<IProduct>(`${this.resourceUrl}/${this.getProductIdentifier(product)}`, product, { observe: 'response' });
+    return this.http.put<IProduct>(`${this.resourceUrl}/${getProductIdentifier(product) as number}`, product, { observe: 'response' });
   }
 
-  partialUpdate(product: PartialUpdateProduct): Observable<EntityResponseType> {
-    return this.http.patch<IProduct>(`${this.resourceUrl}/${this.getProductIdentifier(product)}`, product, { observe: 'response' });
+  partialUpdate(product: IProduct): Observable<EntityResponseType> {
+    return this.http.patch<IProduct>(`${this.resourceUrl}/${getProductIdentifier(product) as number}`, product, { observe: 'response' });
   }
 
   find(id: number): Observable<EntityResponseType> {
@@ -46,24 +41,13 @@ export class ProductService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  getProductIdentifier(product: Pick<IProduct, 'id'>): number {
-    return product.id;
-  }
-
-  compareProduct(o1: Pick<IProduct, 'id'> | null, o2: Pick<IProduct, 'id'> | null): boolean {
-    return o1 && o2 ? this.getProductIdentifier(o1) === this.getProductIdentifier(o2) : o1 === o2;
-  }
-
-  addProductToCollectionIfMissing<Type extends Pick<IProduct, 'id'>>(
-    productCollection: Type[],
-    ...productsToCheck: (Type | null | undefined)[]
-  ): Type[] {
-    const products: Type[] = productsToCheck.filter(isPresent);
+  addProductToCollectionIfMissing(productCollection: IProduct[], ...productsToCheck: (IProduct | null | undefined)[]): IProduct[] {
+    const products: IProduct[] = productsToCheck.filter(isPresent);
     if (products.length > 0) {
-      const productCollectionIdentifiers = productCollection.map(productItem => this.getProductIdentifier(productItem)!);
+      const productCollectionIdentifiers = productCollection.map(productItem => getProductIdentifier(productItem)!);
       const productsToAdd = products.filter(productItem => {
-        const productIdentifier = this.getProductIdentifier(productItem);
-        if (productCollectionIdentifiers.includes(productIdentifier)) {
+        const productIdentifier = getProductIdentifier(productItem);
+        if (productIdentifier == null || productCollectionIdentifiers.includes(productIdentifier)) {
           return false;
         }
         productCollectionIdentifiers.push(productIdentifier);

@@ -1,38 +1,38 @@
-import { TestBed } from '@angular/core/testing';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { RouterTestingHarness, RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { ProductDetailComponent } from './product-detail.component';
 
-describe('Product Management Detail Component', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ProductDetailComponent, RouterTestingModule.withRoutes([], { bindToComponentInputs: true })],
-      providers: [
-        provideRouter(
-          [
-            {
-              path: '**',
-              component: ProductDetailComponent,
-              resolve: { product: () => of({ id: 123 }) },
-            },
-          ],
-          withComponentInputBinding(),
-        ),
-      ],
-    })
-      .overrideTemplate(ProductDetailComponent, '')
-      .compileComponents();
-  });
+describe('Component Tests', () => {
+  describe('Product Management Detail Component', () => {
+    let comp: ProductDetailComponent;
+    let fixture: ComponentFixture<ProductDetailComponent>;
 
-  describe('OnInit', () => {
-    it('Should load product on init', async () => {
-      const harness = await RouterTestingHarness.create();
-      const instance = await harness.navigateByUrl('/', ProductDetailComponent);
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        declarations: [ProductDetailComponent],
+        providers: [
+          {
+            provide: ActivatedRoute,
+            useValue: { data: of({ product: { id: 123 } }) },
+          },
+        ],
+      })
+        .overrideTemplate(ProductDetailComponent, '')
+        .compileComponents();
+      fixture = TestBed.createComponent(ProductDetailComponent);
+      comp = fixture.componentInstance;
+    });
 
-      // THEN
-      expect(instance.product).toEqual(expect.objectContaining({ id: 123 }));
+    describe('OnInit', () => {
+      it('Should load product on init', () => {
+        // WHEN
+        comp.ngOnInit();
+
+        // THEN
+        expect(comp.product).toEqual(expect.objectContaining({ id: 123 }));
+      });
     });
   });
 });

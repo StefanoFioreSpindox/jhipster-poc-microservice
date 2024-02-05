@@ -1,38 +1,31 @@
+jest.mock('@angular/router');
+
 import { TestBed } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRouteSnapshot, ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { ICategory } from '../category.model';
+import { ICategory, Category } from '../category.model';
 import { CategoryService } from '../service/category.service';
 
-import categoryResolve from './category-routing-resolve.service';
+import { CategoryRoutingResolveService } from './category-routing-resolve.service';
 
 describe('Category routing resolve service', () => {
   let mockRouter: Router;
   let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
+  let routingResolveService: CategoryRoutingResolveService;
   let service: CategoryService;
-  let resultCategory: ICategory | null | undefined;
+  let resultCategory: ICategory | undefined;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: convertToParamMap({}),
-            },
-          },
-        },
-      ],
+      imports: [HttpClientTestingModule],
+      providers: [Router, ActivatedRouteSnapshot],
     });
     mockRouter = TestBed.inject(Router);
-    jest.spyOn(mockRouter, 'navigate').mockImplementation(() => Promise.resolve(true));
-    mockActivatedRouteSnapshot = TestBed.inject(ActivatedRoute).snapshot;
+    mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
+    routingResolveService = TestBed.inject(CategoryRoutingResolveService);
     service = TestBed.inject(CategoryService);
     resultCategory = undefined;
   });
@@ -44,12 +37,8 @@ describe('Category routing resolve service', () => {
       mockActivatedRouteSnapshot.params = { id: 123 };
 
       // WHEN
-      TestBed.runInInjectionContext(() => {
-        categoryResolve(mockActivatedRouteSnapshot).subscribe({
-          next(result) {
-            resultCategory = result;
-          },
-        });
+      routingResolveService.resolve(mockActivatedRouteSnapshot).subscribe(result => {
+        resultCategory = result;
       });
 
       // THEN
@@ -57,37 +46,29 @@ describe('Category routing resolve service', () => {
       expect(resultCategory).toEqual({ id: 123 });
     });
 
-    it('should return null if id is not provided', () => {
+    it('should return new ICategory if id is not provided', () => {
       // GIVEN
       service.find = jest.fn();
       mockActivatedRouteSnapshot.params = {};
 
       // WHEN
-      TestBed.runInInjectionContext(() => {
-        categoryResolve(mockActivatedRouteSnapshot).subscribe({
-          next(result) {
-            resultCategory = result;
-          },
-        });
+      routingResolveService.resolve(mockActivatedRouteSnapshot).subscribe(result => {
+        resultCategory = result;
       });
 
       // THEN
       expect(service.find).not.toBeCalled();
-      expect(resultCategory).toEqual(null);
+      expect(resultCategory).toEqual(new Category());
     });
 
     it('should route to 404 page if data not found in server', () => {
       // GIVEN
-      jest.spyOn(service, 'find').mockReturnValue(of(new HttpResponse<ICategory>({ body: null })));
+      jest.spyOn(service, 'find').mockReturnValue(of(new HttpResponse({ body: null as unknown as Category })));
       mockActivatedRouteSnapshot.params = { id: 123 };
 
       // WHEN
-      TestBed.runInInjectionContext(() => {
-        categoryResolve(mockActivatedRouteSnapshot).subscribe({
-          next(result) {
-            resultCategory = result;
-          },
-        });
+      routingResolveService.resolve(mockActivatedRouteSnapshot).subscribe(result => {
+        resultCategory = result;
       });
 
       // THEN

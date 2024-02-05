@@ -1,9 +1,9 @@
 package it.spindox.jhipsterpoc.products.repository.timezone;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.*;
 import java.util.Objects;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "jhi_date_time_wrapper")

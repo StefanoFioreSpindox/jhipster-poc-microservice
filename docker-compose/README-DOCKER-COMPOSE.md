@@ -2,7 +2,7 @@
 
 ## Usage
 
-Launch all your infrastructure by running: `docker compose up -d`.
+Launch all your infrastructure by running: `docker-compose up -d`.
 
 ## Configured Docker services
 
@@ -18,3 +18,5 @@ Launch all your infrastructure by running: `docker compose up -d`.
 - products's postgresql database
 
 ### Additional Services:
+
+- [Keycloak server](http://localhost:9080)

@@ -1,13 +1,13 @@
 #common configuration shared between all applications
 configserver:
-  name: Service Registry
+  name: Docker JHipster Registry
   status: Connected to the JHipster Registry running in Docker
 
 jhipster:
   security:
     authentication:
       jwt:
-        base64-secret: MzllMGI5MGI1ZDdmODgwNWM4M2M5MDFiZjgxNjNlNzY3MzdkY2FjZTkzODQxNjk2NzQ5MzBmOTIxODQwMWFjZTI2YTRhMjcwM2ZkMjJhMDJiZGQzMjAwMjNkNWQyNzliOWE1OQ==
+        base64-secret: ZmMzZjY3NDFmY2E3MjM5NThiNDk1ZGJmYzI3OGI5MmY4ZWJlYTE1ZjhiODhlNGU4MzdkZGJmNjQzYzhmZmRiOGMwM2I5M2RhOTk3NTgyYTNmYTk1ODgwMzUzZGIzYmE4YTUwNw==
 eureka:
   client:
     service-url:

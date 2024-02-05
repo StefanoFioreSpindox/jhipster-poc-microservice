@@ -5,10 +5,12 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +19,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
+import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.r2dbc.convert.MappingR2dbcConverter;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
+import org.springframework.data.r2dbc.core.ReactiveDataAccessStrategy;
 import org.springframework.data.r2dbc.dialect.DialectResolver;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.data.r2dbc.query.UpdateMapper;
@@ -76,7 +80,7 @@ public class DatabaseConfiguration {
     // See https://github.com/r2dbc/r2dbc-h2/pull/139 https://github.com/mirromutth/r2dbc-mysql/issues/105
     @Bean
     public R2dbcCustomConversions r2dbcCustomConversions(R2dbcDialect dialect) {
-        List<Object> converters = new ArrayList<>();
+        List<Object> converters = new ArrayList<>(dialect.getConverters());
         converters.add(InstantWriteConverter.INSTANCE);
         converters.add(InstantReadConverter.INSTANCE);
         converters.add(BitSetReadConverter.INSTANCE);
@@ -84,7 +88,11 @@ public class DatabaseConfiguration {
         converters.add(DurationReadConverter.INSTANCE);
         converters.add(ZonedDateTimeReadConverter.INSTANCE);
         converters.add(ZonedDateTimeWriteConverter.INSTANCE);
-        return R2dbcCustomConversions.of(dialect, converters);
+        converters.addAll(R2dbcCustomConversions.STORE_CONVERTERS);
+        return new R2dbcCustomConversions(
+            CustomConversions.StoreConversions.of(dialect.getSimpleTypeHolder(), converters),
+            Collections.emptyList()
+        );
     }
 
     @Bean

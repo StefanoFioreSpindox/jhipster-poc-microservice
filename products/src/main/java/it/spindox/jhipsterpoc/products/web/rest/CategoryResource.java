@@ -4,13 +4,13 @@ import it.spindox.jhipsterpoc.products.repository.CategoryRepository;
 import it.spindox.jhipsterpoc.products.service.CategoryService;
 import it.spindox.jhipsterpoc.products.service.dto.CategoryDTO;
 import it.spindox.jhipsterpoc.products.web.rest.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link it.spindox.jhipsterpoc.products.domain.Category}.
  */
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api")
 public class CategoryResource {
 
     private final Logger log = LoggerFactory.getLogger(CategoryResource.class);
@@ -49,7 +49,7 @@ public class CategoryResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new categoryDTO, or with status {@code 400 (Bad Request)} if the category has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/categories")
     public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) throws URISyntaxException {
         log.debug("REST request to save Category : {}", categoryDTO);
         if (categoryDTO.getId() != null) {
@@ -72,7 +72,7 @@ public class CategoryResource {
      * or with status {@code 500 (Internal Server Error)} if the categoryDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/categories/{id}")
     public ResponseEntity<CategoryDTO> updateCategory(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody CategoryDTO categoryDTO
@@ -89,7 +89,7 @@ public class CategoryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        CategoryDTO result = categoryService.update(categoryDTO);
+        CategoryDTO result = categoryService.save(categoryDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, categoryDTO.getId().toString()))
@@ -107,7 +107,7 @@ public class CategoryResource {
      * or with status {@code 500 (Internal Server Error)} if the categoryDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/categories/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<CategoryDTO> partialUpdateCategory(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody CategoryDTO categoryDTO
@@ -137,7 +137,7 @@ public class CategoryResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of categories in body.
      */
-    @GetMapping("")
+    @GetMapping("/categories")
     public List<CategoryDTO> getAllCategories() {
         log.debug("REST request to get all Categories");
         return categoryService.findAll();
@@ -149,8 +149,8 @@ public class CategoryResource {
      * @param id the id of the categoryDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the categoryDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategory(@PathVariable("id") Long id) {
+    @GetMapping("/categories/{id}")
+    public ResponseEntity<CategoryDTO> getCategory(@PathVariable Long id) {
         log.debug("REST request to get Category : {}", id);
         Optional<CategoryDTO> categoryDTO = categoryService.findOne(id);
         return ResponseUtil.wrapOrNotFound(categoryDTO);
@@ -162,8 +162,8 @@ public class CategoryResource {
      * @param id the id of the categoryDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
+    @DeleteMapping("/categories/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         log.debug("REST request to delete Category : {}", id);
         categoryService.delete(id);
         return ResponseEntity

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link it.spindox.jhipsterpoc.products.domain.Product}.
+ * Service Implementation for managing {@link Product}.
  */
 @Service
 @Transactional
@@ -35,14 +35,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO save(ProductDTO productDTO) {
         log.debug("Request to save Product : {}", productDTO);
-        Product product = productMapper.toEntity(productDTO);
-        product = productRepository.save(product);
-        return productMapper.toDto(product);
-    }
-
-    @Override
-    public ProductDTO update(ProductDTO productDTO) {
-        log.debug("Request to update Product : {}", productDTO);
         Product product = productMapper.toEntity(productDTO);
         product = productRepository.save(product);
         return productMapper.toDto(product);

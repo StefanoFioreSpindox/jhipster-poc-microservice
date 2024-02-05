@@ -1,12 +1,5 @@
 {
-  "annotations": {
-    "changelogDate": "20240119132644"
-  },
-  "applications": ["gateway", "products"],
-  "clientRootFolder": "products",
-  "databaseType": "sql",
-  "dto": "mapstruct",
-  "entityTableName": "product",
+  "name": "Product",
   "fields": [
     {
       "fieldName": "name",
@@ -22,9 +15,25 @@
       "fieldType": "Integer"
     }
   ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "category",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "category"
+    }
+  ],
+  "entityTableName": "product",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["gateway"],
+  "changelogDate": "20240119132644",
   "microserviceName": "products",
-  "name": "Product",
-  "relationships": [],
-  "searchEngine": "no",
-  "service": "serviceImpl"
+  "clientRootFolder": "products",
+  "databaseType": "sql"
 }

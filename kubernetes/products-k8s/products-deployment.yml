@@ -70,7 +70,7 @@ spec:
                   key: postgresql-password
             - name: SPRING_LIQUIBASE_URL
               value: jdbc:postgresql://products-postgresql.jhipster-poc.svc.cluster.local:5432/products
-            - name: MANAGEMENT_TRACING_BAGGAGE_REMOTE_FIELDS
+            - name: SPRING_SLEUTH_PROPAGATION_KEYS
               value: "x-request-id,x-ot-span-context"
             - name: JAVA_OPTS
               value: " -Xmx256m -Xms256m"
