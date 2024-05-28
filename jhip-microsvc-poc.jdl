@@ -98,14 +98,14 @@ deployment {
   deploymentType docker-compose
   serviceDiscoveryType eureka
   appsFolders [gateway, products]
-  dockerRepositoryName "stefanofiorespindox"
+  dockerRepositoryName "stefanofiore15personal"
 }
 
 deployment {
   deploymentType kubernetes
   serviceDiscoveryType eureka
   appsFolders [gateway, products]
-  dockerRepositoryName "stefanofiorespindox"
+  dockerRepositoryName "stefanofiore15personal"
   kubernetesServiceType Ingress
   ingressType nginx
   ingressDomain "spindox.dev"
